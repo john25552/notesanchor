@@ -8,6 +8,7 @@ import { LibraryModule } from './library/library.module';
 import { FileModule } from './file/file.module';
 import { CommentModule } from './comment/comment.module';
 import { ConfigModule } from '@nestjs/config';
+import { SpaceModule } from './space/space.module';
 
 @Module({
   imports: [UserModule, TypeOrmModule.forRoot({
@@ -19,7 +20,7 @@ import { ConfigModule } from '@nestjs/config';
       database: 'notesphere',
       autoLoadEntities: true,
       synchronize: true,
-    }), MessageModule, LibraryModule, FileModule, CommentModule, ConfigModule.forRoot({isGlobal: true})
+    }), MessageModule, LibraryModule, FileModule, CommentModule, ConfigModule.forRoot({isGlobal: true}), SpaceModule
   ],
   controllers: [AppController],
   providers: [AppService],

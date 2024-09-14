@@ -3,7 +3,7 @@ import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
-@WebSocketGateway()
+@WebSocketGateway({namespace: '/chat'})
 export class MessageGateway {
   constructor(private readonly messageService: MessageService) {}
 
