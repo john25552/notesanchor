@@ -7,7 +7,7 @@ import { Server, Socket } from 'socket.io';
 @WebSocketGateway({
   namespace: 'space',
   cors: {
-    origin: ['https://notespages.netlify.app/', 'http://localhost:5173'], // Replace with your actual frontend URL
+    origin: "*",
     methods: ['GET', 'POST'],
     credentials: true,
   }
