@@ -7,21 +7,16 @@ import * as express from 'express'
 
 dotenv.config();
 
-const server = express();
-const adapter = new ExpressAdapter(server)
-
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, adapter);
+  const app = await NestFactory.create(AppModule);
 
   app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://notespages.netlify.app',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   }));
 
-  await app.init();
+  await app.listen(3000);
 }
 bootstrap();
-
-export default server;
