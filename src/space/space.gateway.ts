@@ -4,7 +4,14 @@ import { CreateSpaceDto } from './dto/create-space.dto';
 import { UpdateSpaceDto } from './dto/update-space.dto';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({namespace: 'space'})
+@WebSocketGateway({
+  namespace: 'space',
+  cors: {
+    origin: ['https://notespages.netlify.app/', 'http://localhost:5173'], // Replace with your actual frontend URL
+    methods: ['GET', 'POST'],
+    credentials: true,
+  }
+})
 export class SpaceGateway  {
   constructor(private readonly spaceService: SpaceService) {}
 
