@@ -19,11 +19,10 @@ export class SpaceGateway  {
   }
 
   @SubscribeMessage('signal')
-  handleSignal(client: Socket, payload: { signal: any; peerId: string; room: string }) {
+  handleSignal(client: Socket, payload: { signal: any; room: string }) {
     // Forward the signaling data to the target peer
-    console.log('signal received')
-    this.server.to(payload.peerId).emit('signal', { peerId: client.id, signal: payload.signal });
-    this.server.to(payload.room).emit('signal', { peerId: client.id, signal: payload.signal });
+    console.log(payload)
+    client.to(payload.room).emit('signal', { peerId: client.id, signal: payload.signal });
   }
   
   @SubscribeMessage('join-room')

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -11,15 +11,25 @@ import { ConfigModule } from '@nestjs/config';
 import { SpaceModule } from './space/space.module';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'notesphere',
-      autoLoadEntities: true,
-      synchronize: true,
+  imports: [UserModule, TypeOrmModule.forRootAsync({
+    useFactory: async ()=> {
+      try {
+        return {
+          type: 'mysql',
+          host: process.env.DATABASE_HOST,
+          port: Number(process.env.DATABASE_PORT),
+          username: process.env.DATABASE_USER,
+          password: process.env.DATABASE_PASSWORD,
+          database: process.env.DATABASE_NAME,
+          autoLoadEntities: true,
+          synchronize: true,
+        }
+      } catch (error) {
+        console.log(error)
+        Logger.error('Database connection error', error);
+        throw error;
+      }
+    }
     }), MessageModule, LibraryModule, FileModule, CommentModule, ConfigModule.forRoot({isGlobal: true}), SpaceModule
   ],
   controllers: [AppController],
