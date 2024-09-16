@@ -26,15 +26,13 @@ export class SpaceGateway  {
   }
 
   @SubscribeMessage('signal')
-  handleSignal(client: Socket, payload: { signal: any; room: string }) {
-    // Forward the signaling data to the target peer
-    console.log(payload)
-    client.to(payload.room).emit('signal', { peerId: client.id, signal: payload.signal });
+  handleSignal(client: Socket, payload: { signalType: any; name: string, sdp: string }) {
+    client.emit('signal', {id:client.id, payload})
   }
   
-  handleConnection(client: Socket){
+  handleConnection(client: Socket, name: string){
     console.log("Connected client with id", client.id)
-    client.emit('new_client', client.id)
+    client.emit('new_client', {clientId: client.id, name})
   }
 
   @SubscribeMessage('findAllSpace')
