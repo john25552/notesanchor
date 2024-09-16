@@ -32,13 +32,9 @@ export class SpaceGateway  {
     client.to(payload.room).emit('signal', { peerId: client.id, signal: payload.signal });
   }
   
-  @SubscribeMessage('join-room')
-  handleJoinRoom(client: Socket, payload: { room: string }) {
-    client.join(payload.room);
-    console.log(`Client ${client.id} joined room ${payload.room}`);
-
-    // Notify other clients in the room about the new peer
-    client.to(payload.room).emit('new-peer', client.id);
+  handleConnection(client: Socket){
+    console.log("Connected client with id", client.id)
+    client.emit('new_client', client.id)
   }
 
   @SubscribeMessage('findAllSpace')
