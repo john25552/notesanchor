@@ -1,5 +1,4 @@
 import { CanActivate, ExecutionContext, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
 
@@ -9,13 +8,17 @@ export class AuthGuard implements CanActivate {
     constructor(private jwtService: JwtService){}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest()
-        const token = this.extractTokenFromHeader(request);
+        const request: Request = context.switchToHttp().getRequest()
+        const cookies = request.headers.cookie
+
+        if(!cookies) throw new UnauthorizedException()
+
+        const token = this.extractTokenFromCookie(cookies);
 
         if(!token) throw new UnauthorizedException();
 
         try{
-            const payload = await this.jwtService.signAsync(token, {secret: this.jwt_key})
+            const payload = await this.jwtService.verify(token, {secret: this.jwt_key})
             request['user'] = payload;
         } catch {
             throw new UnauthorizedException()
@@ -24,8 +27,9 @@ export class AuthGuard implements CanActivate {
         return true
     }
 
-    private extractTokenFromHeader(request: Request){
-        const [type, token] = request.headers.authorization?.split(' ') ?? []
-        return type == "Bearer" ? token : undefined
+    private extractTokenFromCookie(cookies: string){
+        const token = cookies.split('; ').find(row => row.startsWith('access_token='))
+        return token ? token.split('=')[0] : undefined
     }
 }
+

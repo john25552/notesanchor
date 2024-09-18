@@ -1,11 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSpaceDto } from './dto/create-space.dto';
 import { UpdateSpaceDto } from './dto/update-space.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Space } from './entities/space.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class SpaceService {
+  constructor(
+    @InjectRepository(Space)
+    private spaceRepository: Repository<Space>
+  ){}
   create(createSpaceDto: CreateSpaceDto) {
-    return 'This action adds a new space';
+    let newSpace = this.spaceRepository.create()
+    newSpace.name = createSpaceDto.name
+    newSpace.owner
   }
 
   findAll() {
