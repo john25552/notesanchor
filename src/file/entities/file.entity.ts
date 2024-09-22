@@ -15,8 +15,11 @@ export class File {
     @Column()
     type: string
 
-    @Column()
+    @Column('mediumtext')
     body: string
+
+    @Column()
+    associated_folder: string
 
     @CreateDateColumn()
     createdAt: Date

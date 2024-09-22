@@ -1,9 +1,10 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class CreateFileDto {
+export class CreateFolderDto {
     @IsString()
-    associated_folder: string
-
+    @IsNotEmpty()
+    name: string
+    
     @IsString()
     @IsNotEmpty()
     associated_library: string

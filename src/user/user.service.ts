@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -7,13 +7,15 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
+import { LibraryService } from 'src/library/library.service';
+import { CreateLibraryDto } from 'src/library/dto/create-library.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ){}
   async create(createUserDto: CreateUserDto) {
     let isUser = await this.userRepository.findOneBy({email_address: createUserDto.email_address})
@@ -30,10 +32,26 @@ export class UserService {
     user.email_address = createUserDto.email_address
     user.password = hashedPassword
     
-    const {password, createdAt, updatedAt, id, ...createdUser} = await this.userRepository.save(user)
+    let newUser = await this.userRepository.save(user)
+
+    if(!newUser) throw new ServiceUnavailableException('Unable to create user')
+
+    const {password, createdAt, updatedAt, id, ...createdUser} = newUser;
     const payload = {sub: id, email: createdUser.email_address}
 
-    return {access_token: await this.jwtService.signAsync(payload), user: createdUser};
+    return {access_token: this.jwtService.sign(payload, {secret: process.env.JWT_KEY}), user: createdUser};
+  }
+
+  async findOne(email: string){
+    try{
+      let user = await this.userRepository.findOneBy({email_address: email})
+      if(!user) throw new BadRequestException(`No user with email ${email}`)
+      
+      return user
+    } catch(error) {
+      console.log("Error while retrieving user: ", error)
+      throw new BadRequestException(error)
+    }
   }
 
 
@@ -52,7 +70,7 @@ export class UserService {
     const {password, createdAt, updatedAt, id, ...authorizedUser} = isUser
     const payload = {sub: id, email: authorizedUser.email_address}
     
-    return {access_token: await this.jwtService.signAsync(payload), user: authorizedUser};
+    return {access_token: this.jwtService.sign(payload, {secret: process.env.JWT_KEY}), user: authorizedUser};
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

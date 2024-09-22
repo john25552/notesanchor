@@ -9,6 +9,7 @@ import { FileModule } from './file/file.module';
 import { CommentModule } from './comment/comment.module';
 import { ConfigModule } from '@nestjs/config';
 import { SpaceModule } from './space/space.module';
+import { FolderModule } from './folder/folder.module';
 
 @Module({
   imports: [UserModule, TypeOrmModule.forRootAsync({
@@ -30,7 +31,7 @@ import { SpaceModule } from './space/space.module';
         throw error;
       }
     }
-    }), MessageModule, LibraryModule, FileModule, CommentModule, ConfigModule.forRoot({isGlobal: true}), SpaceModule
+    }), MessageModule, LibraryModule, FileModule, CommentModule, ConfigModule.forRoot({isGlobal: true}), SpaceModule, FolderModule
   ],
   controllers: [AppController],
   providers: [AppService],
