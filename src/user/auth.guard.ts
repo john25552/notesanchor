@@ -1,12 +1,16 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Request } from "express";
+import { UserService } from "./user.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {
     private jwt_key = process.env.JWT_KEY;
 
-    constructor(private jwtService: JwtService) {}
+    constructor(
+        private jwtService: JwtService,
+        private userService: UserService
+    ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request: Request = context.switchToHttp().getRequest();
@@ -22,6 +26,10 @@ export class AuthGuard implements CanActivate {
         if (!token) {
             console.log("No token in cookies");
             throw new UnauthorizedException("No token found in cookies");
+        }
+
+        if (this.userService.isBlacklisted(token)) {
+            throw new UnauthorizedException('Logged out user');
         }
 
         try {

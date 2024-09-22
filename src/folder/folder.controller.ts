@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { FolderService } from './folder.service';
 import { CreateFolderDto } from './dto/create-folder.dto';
 import { UpdateFolderDto } from './dto/update-folder.dto';
@@ -12,8 +12,10 @@ export class FolderController {
   constructor(private readonly folderService: FolderService) {}
 
   @Post('create')
+  @UsePipes(new ValidationPipe({transform: true}))
   async create(@Body() createFolderDto: CreateFolderDto, @Res() response: Response, @GetUser() user: any) {
     let createFolder = await this.folderService.create(createFolderDto);
+    console.log('responding with folder: ', createFolder)
     return response.send(createFolder)
   }
 

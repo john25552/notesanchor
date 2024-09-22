@@ -12,6 +12,7 @@ import { CreateLibraryDto } from 'src/library/dto/create-library.dto';
 
 @Injectable()
 export class UserService {
+  private blacklistedTokens = new Set<string>()
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -71,6 +72,18 @@ export class UserService {
     const payload = {sub: id, email: authorizedUser.email_address}
     
     return {access_token: this.jwtService.sign(payload, {secret: process.env.JWT_KEY}), user: authorizedUser};
+  }
+
+  async logout(token: string){
+    this.blacklistToken(token)
+  }
+
+  blacklistToken(token: string) {
+    this.blacklistedTokens.add(token);
+  }
+
+  isBlacklisted(token: string): boolean {
+    return this.blacklistedTokens.has(token);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
