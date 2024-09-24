@@ -38,15 +38,20 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cors": "^2.8.5",
+    "docxtemplater": "^3.50.0",
     "dotenv": "^16.4.5",
+    "mammoth": "^1.8.0",
     "mysql2": "^3.10.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "pdf-parse": "^1.1.1",
+    "pizzip": "^3.1.7",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "serverless-http": "^3.2.0",
     "socket.io": "^4.7.5",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

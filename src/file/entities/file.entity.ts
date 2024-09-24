@@ -21,6 +21,12 @@ export class File {
     @Column()
     associated_folder: string
 
+    @Column()
+    kind: string
+
+    @Column()
+    size: number
+
     @CreateDateColumn()
     createdAt: Date
 

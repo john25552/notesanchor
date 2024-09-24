@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/user/auth.guard';
 import { GetUser } from 'src/user/getuser.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { UploadFileDto } from './dto/upload-file.dto';
 
 @UseGuards(AuthGuard)
 @Controller('file')
@@ -17,14 +18,20 @@ export class FileController {
   @UseInterceptors(FileInterceptor('file'))
   async create(@Body() createFileDto: CreateFileDto, @Res() response: Response, @GetUser() user: any, @UploadedFile() file: Express.Multer.File) {
     let createdFile = await this.fileService.create(createFileDto, file, user)
-    console.log("Responding with file: ", createdFile)
     return response.send(createdFile)
+  }
+
+  @UsePipes(new ValidationPipe({transform: true}))
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async upload(@Body() uploadFileDto: UploadFileDto, @Res() response: Response, @GetUser() user: any, @UploadedFile() file: Express.Multer.File){
+    let files= await this.fileService.upload(uploadFileDto, file, user)
+    return response.send(files)
   }
 
   @Get()
   async findAll(@GetUser() user: any, @Res() response: Response) {
     let files = await this.fileService.findAll(user);
-    console.log("Returning files: ", files)
     return response.send(files)
   }
 
