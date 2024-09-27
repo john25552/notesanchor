@@ -11,16 +11,18 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new IoAdapter(app));
   // app.use(cors({
-  //   origin: [/https:\/\/.*notipage\.netlify\.app$/], // Allow any subdomain of notipage.netlify.app
+  //   origin: ['http://localhost:5173'],
+  //   // origin: [/https:\/\/.*notipage\.netlify\.app$/], // Allow any subdomain of notipage.netlify.app
   //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   //   allowedHeaders: 'Content-Type, Authorization, set-cookie',
   //   credentials: true,
   // }));
   
   app.enableCors({
+    // origin: ['http://localhost:5173'],
     origin: [/https:\/\/.*notipage\.netlify\.app$/], // Allow any subdomain of notipage.netlify.app
     methods: 'GET,POST,PUT,DELETE', // Specify allowed methods
-      allowedHeaders: 'Content-Type, Authorization, set-cookie',
+    allowedHeaders: 'Content-Type, Authorization, set-cookie',
     credentials: true, // Allow credentials like cookies
   });
 
