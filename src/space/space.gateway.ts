@@ -32,7 +32,7 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     console.log("Now rooms in namespace are ", this.namespace.adapter.rooms)
 
-    this.namespace.to(payload.room).emit('message', message)
+    this.namespace.emit('message', message)
   }
 
   @SubscribeMessage('message')
@@ -68,7 +68,7 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("Got signal for ", payload.client, " from ", client.id)
     console.log("The present clients are", this.namespace.adapter.rooms)
 
-    this.namespace.to(payload.client).emit('signal', {
+    this.namespace.except(client.id).emit('signal', {
       signalType: payload.signalType,
       sdp: payload.sdp,
       client: client.id,
@@ -80,7 +80,7 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("Got candidate for ", payload.client, " from ", client.id)
     console.log("The present clients are", this.namespace.adapter.rooms)
 
-    this.namespace.to(payload.client).emit('candidate', {
+    this.namespace.except(client.id).emit('candidate', {
       signalType: payload.signalType,
       candidate: payload.candidate,
       client: client.id,
