@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new IoAdapter(app));
   app.use(cors({
-    origin: ['http://localhost:5173', 'https://master--notipage.netlify.app/'],
+    origin: ['http://localhost:5173', 'https://master--notipage.netlify.app/', 'https://notipage.netlify.app/'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization, set-cookie',
     credentials: true,
