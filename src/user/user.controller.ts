@@ -21,7 +21,7 @@ export class UserController {
   @UsePipes(new ValidationPipe({transform: true}))
   async login(@Body() loginDto: LoginDto, @Res() response: Response) {
       const {user, access_token} = await this.userService.login(loginDto);
-      response.cookie('access_token', access_token, {httpOnly: true, secure: false})
+      response.cookie('access_token', access_token, {httpOnly: true, secure: true, sameSite: 'none', path: '/'})
       return response.send(user)
   }
 
