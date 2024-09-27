@@ -48,7 +48,8 @@ export class UserService {
       let user = await this.userRepository.findOneBy({email_address: email})
       if(!user) throw new BadRequestException(`No user with email ${email}`)
       
-      return user
+      let {password, ...operationalUser}  = user
+      return operationalUser
     } catch(error) {
       console.log("Error while retrieving user: ", error)
       throw new BadRequestException(error)
@@ -56,8 +57,23 @@ export class UserService {
   }
 
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    try {
+      let users = await this.userRepository.find()
+      let operationalUsers = users.map(value => {
+        let user = {
+          full_name: value.full_name,
+          email_address: value.email_address,
+        }
+
+        return user;
+      })
+
+      return operationalUsers
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
+    return ;
   }
 
   async login(loginDto: LoginDto) {
@@ -76,6 +92,7 @@ export class UserService {
 
   async logout(token: string){
     this.blacklistToken(token)
+    return true
   }
 
   blacklistToken(token: string) {

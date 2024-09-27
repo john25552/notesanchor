@@ -1,6 +1,8 @@
+import { Chat } from "src/chat/entities/chat.entity";
 import { File } from "src/file/entities/file.entity";
 import { Library } from "src/library/entities/library.entity";
 import { Message } from "src/message/entities/message.entity";
+import { Space } from "src/space/entities/space.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { v4 as uuidv4 } from "uuid";
 
@@ -32,4 +34,10 @@ export class User {
 
     @OneToMany(type => Message, message => message.owner)
     messages: Message[]
+
+    @OneToMany(type => Space, space => space.owner)
+    spaces: Space[]
+
+    @OneToMany(type => Chat, chat => chat.owner)
+    chats: Chat[]
 }

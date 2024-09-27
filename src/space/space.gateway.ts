@@ -1,62 +1,94 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WsException } from '@nestjs/websockets';
+import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WsException, ConnectedSocket } from '@nestjs/websockets';
 import { SpaceService } from './space.service';
-import { CreateSpaceDto } from './dto/create-space.dto';
 import { UpdateSpaceDto } from './dto/update-space.dto';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Socket } from 'socket.io';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/user/auth.guard';
-import { JwtService } from '@nestjs/jwt';
-
-@WebSocketGateway({
-  namespace: 'space',
-  cors: {
-    origin: "*",
-    methods: ['GET', 'POST'],
-    credentials: true,
-  }
-})
+import { MessageService } from 'src/message/message.service';
+import { GetUser } from 'src/user/getuser.decorator';
 
 @UseGuards(AuthGuard)
-export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server: Server;
-  private jwt_key = process.env.JWT;
+@WebSocketGateway({namespace: 'space', cors: { origin: '*', credentials: true }})
 
+export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly spaceService: SpaceService,
-    private jwtService: JwtService
+    private messagesService: MessageService,
   ) {}
+
+  @WebSocketServer() namespace: Namespace;
   
-  @UseGuards(AuthGuard)
-  @SubscribeMessage('createSpace')
-  create(client: Socket, @MessageBody() createSpaceDto: CreateSpaceDto) {
-    return this.spaceService.create(createSpaceDto);
+
+  @SubscribeMessage('create_room')
+  async handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() payload: {room: string}, @GetUser() user: any) {
+    console.log("Client ", client.id, " wants to create room ", payload.room)
+    client.join(payload.room)
+    let message = await this.messagesService.create({
+      body: `Created room ${payload.room}`,
+      sender_id: user.email,
+      receiver_id: payload.room,
+      type: 'Space'
+    }, user)
+
+    console.log("Now rooms in namespace are ", this.namespace.adapter.rooms)
+
+    this.namespace.to(payload.room).emit('message', message)
+  }
+
+  @SubscribeMessage('message')
+  async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: {body: string, receiver: string }, @GetUser() user: any){
+    let message = await this.messagesService.create({
+      body: payload.body,
+      sender_id: user.email,
+      receiver_id: payload.receiver,
+      type: 'Space'
+    }, user)
+
+    this.namespace.to(message.createdMessage.receiver).emit('message', message)
+  }
+
+  @SubscribeMessage('join')
+  async handleJoin(@MessageBody() payload: {room: string}, @ConnectedSocket() client: Socket,  @GetUser() user: any){
+    console.log("Got a join request to room ", payload.room)
+    // let member = this.spaceService.findMember(user.email, payload.room)
+    // if(member) {
+      client.join(payload.room)
+      console.log("Member with id ", client.id, " added to room")
+      console.log("Rooms are ", this.namespace.adapter.rooms)
+
+      let messages = await this.messagesService.findAll(payload.room)
+      client.emit('messages', messages)
+      this.namespace.except(client.id).emit('new_client', client.id)
+
+    // }
   }
   
   @SubscribeMessage('signal')
-  handleSignal(client: Socket, payload: { signalType: any; name: string, sdp: string }) {
-    client.emit('signal', {id:client.id, payload})
+  handleSignal(@ConnectedSocket() client: Socket, @MessageBody() payload: { signalType: any; client: string, sdp: string, room: string }) {
+    console.log("Got signal for ", payload.client, " from ", client.id)
+    console.log("The present clients are", this.namespace.adapter.rooms)
+
+    this.namespace.to(payload.client).emit('signal', {
+      signalType: payload.signalType,
+      sdp: payload.sdp,
+      client: client.id,
+    })
+  }
+
+  @SubscribeMessage('candidate')
+  handleCandidate(@ConnectedSocket() client: Socket, @MessageBody() payload: { signalType: any; client: string, candidate: string, room: string }){
+    console.log("Got candidate for ", payload.client, " from ", client.id)
+    console.log("The present clients are", this.namespace.adapter.rooms)
+
+    this.namespace.to(payload.client).emit('candidate', {
+      signalType: payload.signalType,
+      candidate: payload.candidate,
+      client: client.id,
+    })
   }
   
-  async handleConnection(client: Socket, name: string){
-    try{
-      const cookies = client.handshake.headers.cookie
-  
-      if(!cookies) throw new WsException('Unathorized domain')
-  
-      const token = this.extractTokenFromCookie(cookies);
-  
-      if(!token) throw new WsException("Unathorized domain")
-  
-      try{
-        const payload = await this.jwtService.verify(token, {secret: this.jwt_key})
-        client['user'] = payload;
-      } catch {
-          throw new WsException("Unauthorized user")
-      }
-    } catch(error) {
-      console.log("Error from new connection", error)
-      client.disconnect()
-    }
+  async handleConnection(@ConnectedSocket() client: Socket, @MessageBody() payload: {room: string}){
+    this.namespace.except(client.id).emit('new_client', client.id)
   }
 
   handleDisconnect(){
@@ -70,7 +102,7 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('findOneSpace')
   findOne(@MessageBody() id: number) {
-    return this.spaceService.findOne(id);
+
   }
 
   @SubscribeMessage('updateSpace')
@@ -81,10 +113,5 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('removeSpace')
   remove(@MessageBody() id: number) {
     return this.spaceService.remove(id);
-  }
-
-  extractTokenFromCookie(cookies: string){
-    const token = cookies.split('; ').find(row => row.startsWith('access_token='))
-    return token ? token.split('=')[0] : undefined
   }
 }

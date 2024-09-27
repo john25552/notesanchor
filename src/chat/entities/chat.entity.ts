@@ -1,21 +1,19 @@
 import { User } from "src/user/entities/user.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { v4 as uuidv4 } from "uuid";
+import {v4 as uuidv4} from 'uuid'
+
 
 @Entity()
-export class Space {
+export class Chat {
     @PrimaryGeneratedColumn('uuid')
-    id: string = uuidv4();
+    id: string = uuidv4()
 
     @Column()
     name: string
 
-    @Column('mediumtext')
-    description: string 
-
-    @ManyToOne(type => User, user => user.spaces)
+    @ManyToOne(type => User, user => user.chats)
     owner: User
 
-    @Column('json')
+    @Column("json")
     participants: string[]
 }

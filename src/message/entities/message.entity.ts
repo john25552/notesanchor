@@ -8,17 +8,20 @@ export class Message {
     @PrimaryGeneratedColumn('uuid')
     id: string = uuidv4();
 
-    @Column()
+    @Column('mediumtext')
     body: string
 
     @Column()
-    sender_id: string
+    sender: string
 
     @Column()
-    reciever_id: string
+    receiver: string
 
     @Column()
-    type: "Group" | "Private"
+    target: string
+
+    @Column()
+    type: "Group" | "Private" | "Space"
 
     @CreateDateColumn()
     sentAt: Date

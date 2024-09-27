@@ -10,9 +10,10 @@ import { CommentModule } from './comment/comment.module';
 import { ConfigModule } from '@nestjs/config';
 import { SpaceModule } from './space/space.module';
 import { FolderModule } from './folder/folder.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forRootAsync({
+  imports: [UserModule,  SpaceModule, TypeOrmModule.forRootAsync({
     useFactory: async ()=> {
       try {
         return {
@@ -31,7 +32,7 @@ import { FolderModule } from './folder/folder.module';
         throw error;
       }
     }
-    }), MessageModule, LibraryModule, FileModule, CommentModule, ConfigModule.forRoot({isGlobal: true}), SpaceModule, FolderModule
+    }), MessageModule, LibraryModule, FileModule, CommentModule, ConfigModule.forRoot({isGlobal: true}), FolderModule, ChatModule
   ],
   controllers: [AppController],
   providers: [AppService],

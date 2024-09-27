@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, InternalServerErrorException, UnauthorizedException, UsePipes, ValidationPipe, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UnauthorizedException, UsePipes, ValidationPipe, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,11 +26,13 @@ export class UserController {
   }
 
   @Post('logout')
-  async logout(@Req() request: Request) {
+  async logout(@Req() request: Request, @Res() response: Response) {
     let cookie = request.headers.cookie
     let token = this.extractTokenFromCookie(cookie)
     if(!token) throw new UnauthorizedException('No auth token present')
-    let res = await this.userService.logout(token)
+    let isLoggedOut = await this.userService.logout(token)
+    
+    return response.send(isLoggedOut)
   }
 
   private extractTokenFromCookie(cookies: string): string | undefined {
@@ -39,8 +41,9 @@ export class UserController {
 }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll(@Res() response: Response) {
+    let users = await this.userService.findAll()
+    return response.send(users);
   }
 
   @Get(':email_address')

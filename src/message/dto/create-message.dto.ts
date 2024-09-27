@@ -11,10 +11,10 @@ export class CreateMessageDto {
 
     @IsString()
     @IsNotEmpty()
-    reciever_id: string
+    receiver_id: string
 
     @IsNotEmpty()
     @IsString()
-    type: "Group" | "Private"
+    type: "Group" | "Private" | "Space"
 
 }
