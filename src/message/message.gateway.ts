@@ -25,7 +25,7 @@ export class MessageGateway {
   @SubscribeMessage('create_message')
   async create(@MessageBody() createMessageDto: CreateMessageDto, @ConnectedSocket() client: Socket, @GetUser() user: any) {
     let message = await this.messageService.create(createMessageDto, user) 
-    console.log("Sending message over socket room ", message.createdMessage.receiver)
+    console.log("Sending message over socket room ", createMessageDto)
     console.log("Sockets are ", this.namespace.adapter.rooms)
     this.namespace.emit('chat_message', message)
   }
