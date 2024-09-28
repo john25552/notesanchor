@@ -41,8 +41,6 @@ export class MessageGateway {
     
     let participants = await this.chatService.findParticipants(payload.room);
   
-    let participant = participants.find(participant => user.email);
-    if (!participant) throw new WsException('Unauthorized chat access');
   
     client.join(payload.room);
     console.log(`Client ${client.id} joined room:`, payload.room);
