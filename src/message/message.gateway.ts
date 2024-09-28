@@ -27,7 +27,7 @@ export class MessageGateway {
     let message = await this.messageService.create(createMessageDto, user) 
     console.log("Sending message over socket room ", message.createdMessage.receiver)
     console.log("Sockets are ", this.namespace.adapter.rooms)
-    this.namespace.to(message.createdMessage.receiver).emit('message', message)
+    this.namespace.emit('chat_message', message)
   }
 
   // Room must be a chatId or Message receiver

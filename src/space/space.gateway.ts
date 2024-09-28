@@ -66,7 +66,6 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('signal')
   handleSignal(@ConnectedSocket() client: Socket, @MessageBody() payload: { signalType: any; client: string, sdp: string, room: string }) {
     console.log("Got signal for ", payload.client, " from ", client.id)
-    console.log("The present clients are", this.namespace.adapter.rooms)
 
     this.namespace.except(client.id).emit('signal', {
       signalType: payload.signalType,
@@ -78,7 +77,6 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('candidate')
   handleCandidate(@ConnectedSocket() client: Socket, @MessageBody() payload: { signalType: any; client: string, candidate: string, room: string }){
     console.log("Got candidate for ", payload.client, " from ", client.id)
-    console.log("The present clients are", this.namespace.adapter.rooms)
 
     this.namespace.except(client.id).emit('candidate', {
       signalType: payload.signalType,
