@@ -63,15 +63,10 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // }
   }
   
-  @SubscribeMessage('signal')
-  handleSignal(@ConnectedSocket() client: Socket, @MessageBody() payload: { signalType: any; client: string, sdp: string, room: string }) {
-    console.log("Got signal for ", payload.client, " from ", client.id)
+  @SubscribeMessage('connect')
+  handleSignal(@ConnectedSocket() client: Socket, @MessageBody() peerId: string) {
 
-    this.namespace.except(client.id).emit('signal', {
-      signalType: payload.signalType,
-      sdp: payload.sdp,
-      client: client.id,
-    })
+    this.namespace.except(client.id).emit('connect', peerId)
   }
 
   @SubscribeMessage('candidate')

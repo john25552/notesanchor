@@ -43,8 +43,6 @@ export class MessageGateway {
   
   
     client.join(payload.room);
-    console.log(`Client ${client.id} joined room:`, payload.room);
-    console.log("Rooms after join:", this.namespace.adapter.rooms);
   }
 
   @SubscribeMessage('findAllMessage')
