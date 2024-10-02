@@ -63,10 +63,10 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // }
   }
   
-  @SubscribeMessage('connect')
+  @SubscribeMessage('connectPeer')
   handleSignal(@ConnectedSocket() client: Socket, @MessageBody() peerId: string) {
 
-    this.namespace.except(client.id).emit('connect', peerId)
+    this.namespace.except(client.id).emit('connectPeer', peerId)
   }
 
   @SubscribeMessage('candidate')
