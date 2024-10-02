@@ -32,10 +32,10 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     console.log("Now rooms in namespace are ", this.namespace.adapter.rooms)
 
-    this.namespace.emit('message', message)
+    this.namespace.emit('space_message', message)
   }
 
-  @SubscribeMessage('message')
+  @SubscribeMessage('space_message')
   async handleMessage(@ConnectedSocket() client: Socket, @MessageBody() payload: {body: string, receiver: string }, @GetUser() user: any){
     let message = await this.messagesService.create({
       body: payload.body,
@@ -44,7 +44,7 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
       type: 'Space'
     }, user)
 
-    this.namespace.to(message.createdMessage.receiver).emit('message', message)
+    this.namespace.to(message.createdMessage.receiver).emit('space_message', message)
   }
 
   @SubscribeMessage('join')
