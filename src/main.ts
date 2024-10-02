@@ -20,7 +20,7 @@ async function bootstrap() {
   
   app.enableCors({
     // origin: ['http://localhost:5173'],
-    origin: ["https://notipage.netlify.app", 'http://localhost:5173'], // Allow any subdomain of notipage.netlify.app
+    origin: ["https://notipage.netlify.app", "https://notesanchor.netlify.app", 'http://localhost:5173'], // Allow any subdomain of notipage.netlify.app
     methods: 'GET,POST,PUT,DELETE', // Specify allowed methods
     allowedHeaders: 'Content-Type, Authorization, set-cookie',
     credentials: true, // Allow credentials like cookies
