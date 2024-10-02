@@ -44,7 +44,7 @@ export class SpaceGateway implements OnGatewayConnection, OnGatewayDisconnect {
       type: 'Space'
     }, user)
 
-    this.namespace.to(message.createdMessage.receiver).emit('space_message', message)
+    this.namespace.emit('space_message', message)
   }
 
   @SubscribeMessage('join')
